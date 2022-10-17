@@ -16,6 +16,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var possibleEnemies = ["ball", "hammer", "tv"]
     var gameTimer: Timer?
     var isGameOver = false
+    var enemyCount = 1
+    var timeInt = 1.0
     
     var score = 0 {
         didSet {
@@ -48,7 +50,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.gravity = .zero
         physicsWorld.contactDelegate = self
         
-        gameTimer = Timer.scheduledTimer(timeInterval: 0.35, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
+        gameTimer = Timer.scheduledTimer(timeInterval: timeInt, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -76,6 +78,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     @objc func createEnemy() {
         guard let enemy = possibleEnemies.randomElement() else { return }
         
+        enemyCount += 1
+        print(enemyCount)
+        
         let sprite = SKSpriteNode(imageNamed: enemy)
         sprite.position = CGPoint(x: 1200, y: Int.random(in: 50...736))
         addChild(sprite)
@@ -96,6 +101,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if !isGameOver {
             score += 1
+        }
+        
+        if enemyCount % 5 == 0 && timeInt > 0.10000000000000014 {
+            gameTimer?.invalidate()
+            timeInt -= 0.1
+            gameTimer = Timer.scheduledTimer(timeInterval: timeInt, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
+            gameTimer?.fire()
+            print(timeInt)
+        }
+        
+        if isGameOver {
+            gameTimer?.invalidate()
+            let gameOver = SKSpriteNode(imageNamed: "gameOver")
+            gameOver.position = CGPoint(x: 512, y: 384)
+            addChild(gameOver)
+            
+            let finalScore = SKLabelNode(fontNamed: "Chalkduster")
+            finalScore.text = "Final score: \(score)"
+            finalScore.position = CGPoint(x: 512, y: 320)
+            addChild(finalScore)
         }
     }
 }
