@@ -79,7 +79,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         guard let enemy = possibleEnemies.randomElement() else { return }
         
         enemyCount += 1
-        print(enemyCount)
         
         let sprite = SKSpriteNode(imageNamed: enemy)
         sprite.position = CGPoint(x: 1200, y: Int.random(in: 50...736))
@@ -90,6 +89,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.physicsBody?.angularVelocity = 5
         sprite.physicsBody?.linearDamping = 0
         sprite.physicsBody?.angularDamping = 0
+        
+        if isGameOver {
+            gameTimer?.invalidate()
+            let gameOver = SKSpriteNode(imageNamed: "gameOver")
+            gameOver.position = CGPoint(x: 512, y: 384)
+            addChild(gameOver)
+            
+            let finalScore = SKLabelNode(fontNamed: "Chalkduster")
+            finalScore.text = "Final score: \(score)"
+            finalScore.position = CGPoint(x: 512, y: 320)
+            addChild(finalScore)
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -109,18 +120,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             gameTimer = Timer.scheduledTimer(timeInterval: timeInt, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
             gameTimer?.fire()
             print(timeInt)
-        }
-        
-        if isGameOver {
-            gameTimer?.invalidate()
-            let gameOver = SKSpriteNode(imageNamed: "gameOver")
-            gameOver.position = CGPoint(x: 512, y: 384)
-            addChild(gameOver)
-            
-            let finalScore = SKLabelNode(fontNamed: "Chalkduster")
-            finalScore.text = "Final score: \(score)"
-            finalScore.position = CGPoint(x: 512, y: 320)
-            addChild(finalScore)
         }
     }
 }
